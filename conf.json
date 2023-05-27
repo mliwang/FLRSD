@@ -1,0 +1,30 @@
+{
+	
+	"model_name" : "GINConv",
+	"num_source":5,
+	
+	"beta":0.5,
+	
+	"nfeat":4,
+	"nhid":256,
+	"nclass":256,
+	"dropout":0.2,
+	
+	"no_models" :10,
+	
+	"dataset" : "public_karate",
+	"undlying" : "SI",
+	"global_epochs" :10,
+	
+	"local_epochs" :20,
+	
+	"k" :5,
+	
+	"batch_size" : 64,
+	
+	"lr" : 0.0001,
+	
+	"momentum" : 0.01,
+	
+	"lambda" : 0.2
+}
