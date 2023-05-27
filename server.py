@@ -38,7 +38,7 @@ class Server(object):
 		dataset_size = 0
 		pre_user=[]#
 		Groud_user=[]#
-		A=torch.tensor(A1,dtype=torch.float32)
+		# A=torch.tensor(A1,dtype=torch.float32)
 		for batch_id, batch in enumerate(self.eval_loader):
 			X,state,Y =(x.to(device) for x in batch)
 			Groud_user.append(Y.squeeze(2).cpu().numpy()) #b,n
@@ -46,7 +46,7 @@ class Server(object):
 			dataset_size += X.size()[0]
 			del batch
 			with torch.no_grad():
-				_,T_mask,_,state_orginal= self.global_model(X,state,A)
+				_,T_mask,_,state_orginal= self.global_model(X,state,A1)
 				state_orginal=F.softmax(state_orginal,dim=2)
 				pred=torch.mul(T_mask.repeat(1,1,2),state_orginal)
 				source_user=torch.argmax(pred,dim=2)#b,n
@@ -94,7 +94,7 @@ def eval(pre_user,Groud_user,A_graph):
 		recall=recall+rt#recall_score(t,pre_user[i])
 		f1_micro=f1_micro+ft#f1_score(t,pre_user[i])
 		
-		dis=dis+error_distance(A_graph,pre_user[i],t)
+		#dis=dis+error_distance(A_graph,pre_user[i],t)
 	results['accuracy']=accu/(1.0 * len(Groud_user))
 	results['precision']=precision/(1.0 * len(Groud_user))
 	results['recall']=recall/(1.0 * len(Groud_user))

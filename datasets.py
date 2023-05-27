@@ -24,14 +24,17 @@ def getdataForpro(dataset, num_source, popmodel, train_pro=0.9):
     output_dir = "../%s/%s/source_%d" % (dataset, popmodel, num_source)
     with open(output_dir + "/adj.pkl", 'rb') as f:
         A = pickle.load(f)
-    Threadlists = [i for i in range(1000)]
+    Threadlists = [i for i in range(10000)]
     random.shuffle(Threadlists)
     train_thread = Threadlists[:int(len(Threadlists) * train_pro)]
     test_thread = list(filter(lambda x: x not in train_thread, Threadlists))
     print('训练样本', len(train_thread), '测试样本:', len(test_thread))
 
-    return train_thread, test_thread, A
-
+    return train_thread, test_thread, len(A)
+def getadjA__(arg):
+    with open(arg['indir']+ "/adj.pkl", 'rb') as f:
+        A = pickle.load(f)
+    return np.array(A)
 
 class G_TensorDataset(Dataset):
     """Dataset wrapping data and target tensors.
@@ -44,18 +47,19 @@ class G_TensorDataset(Dataset):
         target_tensor (Tensor): contains sample targets (labels).
     """
 
-    def __init__(self, datasetname, thread, global_graph, num_source, inputdir, istrain=True, alpha=0.4):
+    def __init__(self, datasetname, thread, num_source, istrain=True, alpha=0.4,arg=None):
         self.istrain = istrain
 
         self.datasetname = datasetname
         self.thread = thread
         self.alpha = alpha
         self.num_source = num_source
-        self.datadir = inputdir
+        self.arg=arg
 
-        self.A = self.graph = np.array(global_graph)  # 邻接矩阵
 
-        self.S = getAdjNormornize(self.A)
+        # self.A = self.graph = np.array(global_graph)  # 邻接矩阵
+
+        self.S = getAdjNormornize(getadjA__(arg))
         # 填空值
         from sklearn.impute import SimpleImputer
         imp = SimpleImputer(missing_values=np.nan, strategy='mean')
@@ -73,7 +77,7 @@ class G_TensorDataset(Dataset):
         '''
         #        print(index)
         batch = self.thread[index]  # 一个thread 列表
-        with open(self.datadir + "/Thread_%d.pkl" % batch, 'rb') as f:
+        with open(self.arg['indir']+ "/Thread_%d.pkl" % batch, 'rb') as f:
             data = pickle.load(f)
         '''
         {'source_id':list_s,
@@ -82,9 +86,9 @@ class G_TensorDataset(Dataset):
         '''
 
         # 构造state
-        state = -np.ones((len(self.graph), 1))
+        state = -np.ones((len(self.S), 1))
 
-        v34 = np.zeros((len(self.graph), 2))
+        v34 = np.zeros((len(self.S), 2))
         # u_sum_in[np.where(u_sum_in == 0)] = 1
         for u, s in enumerate(data['net_state']):
             if s == 1:
@@ -106,7 +110,7 @@ class G_TensorDataset(Dataset):
 
         if self.istrain:
             # 构造Y
-            Y = np.zeros((len(self.graph), 1))
+            Y = np.zeros((len(self.S), 1))
             # 找到源头用户
             for u in data['source_id']:
                 Y[u][0] = 1

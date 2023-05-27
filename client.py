@@ -31,8 +31,8 @@ class Client(object):
 
 		self.train_loader = torch.utils.data.DataLoader(self.train_dataset, batch_size=conf["batch_size"], 
 									sampler=torch.utils.data.sampler.SubsetRandomSampler(train_indices))
-									
-		
+
+
 	def local_train(self, model,A):
 
 		for name, param in model.state_dict().items():
@@ -48,7 +48,7 @@ class Client(object):
 		#print(id(self.local_model))
 
 		self.local_model.train()
-		A=torch.tensor(A,dtype=torch.float32) 
+
 		localloss=[]
 		for e in range(self.conf["local_epochs"]):
 			optimizer.zero_grad()

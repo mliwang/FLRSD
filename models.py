@@ -120,7 +120,7 @@ class Mycluster(nn.Module):
 
 
 class RumorDetect(nn.Module):
-    def __init__(self, modelname, node_num, nfeat, nhid, nclass, dropout, device, num_clusters=5, hidden=64):
+    def __init__(self, modelname, node_num, nfeat, nhid, nclass, dropout, device, num_clusters=5, hidden=256):
         '''
         node_num图中节点总数
         nfeat:输入x特征矩阵维度

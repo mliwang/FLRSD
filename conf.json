@@ -1,9 +1,9 @@
 {
-	
+	"fl": "bfl",
 	"model_name" : "GINConv",
 	"num_source":5,
 	
-	"beta":0.5,
+	"beta":0.1,
 	
 	"nfeat":4,
 	"nhid":256,
@@ -12,13 +12,13 @@
 	
 	"no_models" :10,
 	
-	"dataset" : "public_karate",
+	"dataset" : "facebook",
 	"undlying" : "SI",
-	"global_epochs" :10,
+	"global_epochs" :50,
 	
-	"local_epochs" :20,
+	"local_epochs" :3,
 	
-	"k" :5,
+	"k" :8,
 	
 	"batch_size" : 64,
 	
@@ -26,5 +26,5 @@
 	
 	"momentum" : 0.01,
 	
-	"lambda" : 0.2
+	"lambda" : 0.5
 }
