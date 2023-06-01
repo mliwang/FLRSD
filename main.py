@@ -92,7 +92,7 @@ def main(conf):
 	A=torch.tensor(getadjA__(arg),dtype=torch.float32)
 	for e in range(conf["global_epochs"]):
 		#这里要改，都参与了就把所有的都传上来
-		candidates =clients #random.sample(clients, conf["k"])#k表明每轮通信选几个机器的参数
+		candidates =random.sample(clients, conf["k"])#k表明每轮通信选几个机器的参数
 		weight_accumulator = {}
 		for name, params in server.global_model.state_dict().items():
 			weight_accumulator[name] = torch.zeros_like(params)
@@ -126,10 +126,16 @@ def main(conf):
 		mom_loss[e]=mom_loss[e]-bemean
 		maxml=mom_loss[e].max()
 		mom_loss[e]=(torch.div(mom_loss[e],maxml)+1)*0.5
-		for c in range(len(candidates)):
+
+		summom=0
+		for c in candidates:
+			summom+=mom_loss[e][c.client_id]
+
+		for candi in candidates:
+			c=candi.client_id
 			diff=aadiff[c]
 			if conf["bfl"]=="bfl":
-				w=mom_loss[e][c]
+				w=mom_loss[e][c]/summom
 			else:
 				w=1/len(candidates)
 			for name, params in server.global_model.state_dict().items():
