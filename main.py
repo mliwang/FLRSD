@@ -20,20 +20,20 @@ from datasets import *
 os.environ['KMP_DUPLICATE_LIB_OK'] = 'TRUE'	
 
 
-from multiprocessing import  Process
+from multiprocessing import Process
 import time
 
 def multi_Process(candidates,model,A,Totaldatasize):
     print("start training based on boosted FL")
-    threads = []           # 定义一个线程组
+    threads = []          
     for indexofclients,c in enumerate(candidates):
-        threads.append(    # 线程组中加入赋值后的MyThread类
-            MyProcess(indexofclients, c,model,A)  # 将每一个客户端的内容传到重写的MyThread类中
+        threads.append(   
+            MyProcess(indexofclients, c,model,A)  # 将每一个客户端的内容传到重写的类中
         )
-    for thread in threads: # 每个线程组start
+    for thread in threads: 
         thread.start()
 
-    for thread in threads: # 每个线程组join
+    for thread in threads:
         thread.join()
         
     clients_num=len(candidates)
@@ -49,7 +49,7 @@ def multi_Process(candidates,model,A,Totaldatasize):
         loss[index]=lt
         
     print("end")
-    return aadiff, datasize, loss# 返回多线程返回的结果组成的列表
+    return aadiff, datasize, loss
 class MyProcess(Process):  # 重写Process类，加入获取返回值的函数
 
     def __init__(self, indexofclients, c,model,A):
@@ -96,7 +96,7 @@ def main(conf):
 		for name, params in server.global_model.state_dict().items():
 			weight_accumulator[name] = torch.zeros_like(params)
 
-		#尝试把下面这段代码并行化
+		
     #################顺序执行，用于调试##################
 # 		datasize = torch.zeros(conf["no_models"])
 # 		aadiff=[]
@@ -106,10 +106,10 @@ def main(conf):
 # 			aadiff.append(diff)
 # 			datasize[indexofclients]=torch.tensor(float(len(c.train_loader))/len(train_datasets),dtype=torch.float32)
 # 			mom_loss[e,indexofclients]=lt
-        ############多线程并行化运行#########################
+        ############多进程并行化运行#########################
 		totalsize=len(train_datasets)
 		start = time.time()
-		aadiff, datasize, loss_currentEpoch=multi_thread(candidates,server.global_model,A,totalsize)
+		aadiff, datasize, loss_currentEpoch=multi_Process(candidates,server.global_model,A,totalsize)
 		end = time.time()
 		print("train time:",end-start)
 		mom_loss[e]=loss_currentEpoch
