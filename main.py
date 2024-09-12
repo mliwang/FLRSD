@@ -60,8 +60,8 @@ class MyProcess(Process):  # 重写Process类，加入获取返回值的函数
         self.A=A
 
     def run(self):                    # 新加入的函数，该函数目的：
-        diff,lt =self.client.local_train(self.model,self.A)#第一个参数是梯度改变量，第二个是平均损失 # ①。调craw(arg)函数，并将初试化的url以参数传递——实现客户端训练
-        self.diff=diff                             # ②。并获取craw(arg)函数的返回值存入本类的定义的值result中
+        diff,lt =self.client.local_train(self.model,self.A)#第一个参数是梯度改变量，第二个是平均损失 
+        self.diff=diff                             
         self.loss=lt 
 
     def get_result(self):  #新加入函数，该函数目的：返回run()函数得到的result
