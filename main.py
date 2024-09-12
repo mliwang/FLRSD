@@ -20,15 +20,15 @@ from datasets import *
 os.environ['KMP_DUPLICATE_LIB_OK'] = 'TRUE'	
 
 
-import threading
+from multiprocessing import  Process
 import time
 
-def multi_thread(candidates,model,A,Totaldatasize):
+def multi_Process(candidates,model,A,Totaldatasize):
     print("start training based on boosted FL")
     threads = []           # 定义一个线程组
     for indexofclients,c in enumerate(candidates):
         threads.append(    # 线程组中加入赋值后的MyThread类
-            MyThread(indexofclients, c,model,A)  # 将每一个客户端的内容传到重写的MyThread类中
+            MyProcess(indexofclients, c,model,A)  # 将每一个客户端的内容传到重写的MyThread类中
         )
     for thread in threads: # 每个线程组start
         thread.start()
@@ -50,10 +50,10 @@ def multi_thread(candidates,model,A,Totaldatasize):
         
     print("end")
     return aadiff, datasize, loss# 返回多线程返回的结果组成的列表
-class MyThread(threading.Thread):  # 重写threading.Thread类，加入获取返回值的函数
+class MyProcess(Process):  # 重写Process类，加入获取返回值的函数
 
     def __init__(self, indexofclients, c,model,A):
-        threading.Thread.__init__(self)
+        super(MyProcess,self).__init__()
         self.index = indexofclients                # 初始化传入的index
         self.client=c
         self.model=model
@@ -66,7 +66,6 @@ class MyThread(threading.Thread):  # 重写threading.Thread类，加入获取返
 
     def get_result(self):  #新加入函数，该函数目的：返回run()函数得到的result
         return self.index,self.diff,self.loss
-
 def main(conf):
 	output_dir = "../%s/%s/source_%d" % (conf["dataset"], conf["undlying"], conf["num_source"])
 	arg={}
